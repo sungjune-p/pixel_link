@@ -81,7 +81,7 @@ def config_initialization():
 
 
 def to_txt(txt_path, image_name, 
-           image_data, pixel_pos_scores, link_pos_scores):
+           image_data, pixel_pos_scores, link_pos_scores, opath, i):
     # write detection result as txt files
     def write_result_as_txt(image_name, bboxes, path):
         filename = util.io.join_path(path, 'res_%s.txt'%(image_name))
@@ -94,7 +94,7 @@ def to_txt(txt_path, image_name,
         print 'result has been written to:', filename
     
     mask = pixel_link.decode_batch(pixel_pos_scores, link_pos_scores)[0, ...]
-    bboxes = pixel_link.mask_to_bboxes(mask, image_data.shape)
+    bboxes = pixel_link.mask_to_bboxes(mask, image_name, image_data, opath, i, image_data.shape)
     write_result_as_txt(image_name, bboxes, txt_path)
 
 def test():
@@ -137,13 +137,15 @@ def test():
     checkpoint = FLAGS.checkpoint_path
     checkpoint_name = util.io.get_filename(str(checkpoint));
     dump_path = util.io.join_path(logdir, checkpoint_name)
-    txt_path = util.io.join_path(dump_path,'txt')        
+    txt_path = util.io.join_path(dump_path,'txt')
+    out_path = util.io.join_path(dump_path, 'cropped image')
     zip_path = util.io.join_path(dump_path, checkpoint_name + '_det.zip')
     
     with tf.Session(config = sess_config) as sess:
         saver.restore(sess, checkpoint)
 
         for iter, image_name in enumerate(image_names):
+            i = 0
             image_data = util.img.imread(
                 util.io.join_path(FLAGS.dataset_dir, image_name), rgb = True)
             image_name = image_name.split('.')[0]
@@ -156,7 +158,7 @@ def test():
             print '%d/%d: %s'%(iter + 1, len(image_names), image_name)
             to_txt(txt_path,
                     image_name, image_data, 
-                    pixel_pos_scores, link_pos_scores)
+                    pixel_pos_scores, link_pos_scores, out_path, i)
 
             
     # create zip file for icdar2015

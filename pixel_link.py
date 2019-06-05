@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-
+import os
 import util
 
 PIXEL_CLS_WEIGHT_all_ones = 'PIXEL_CLS_WEIGHT_all_ones' 
@@ -330,7 +330,7 @@ def rect_to_xys(rect, image_shape):
 
 # @util.dec.print_calling_in_short
 # @util.dec.timeit
-def mask_to_bboxes(mask, image_shape =  None, min_area = None, 
+def mask_to_bboxes(mask, image_name, image_data, opath, i, image_shape = None, min_area = None,
                    min_height = None, min_aspect_ratio = None):
     import config
     feed_shape = config.train_image_shape
@@ -371,6 +371,14 @@ def mask_to_bboxes(mask, image_shape =  None, min_area = None,
 #             continue
         xys = rect_to_xys(rect, image_shape)
         bboxes.append(xys)
+        X_min = min(xys[0], xys[2], xys[4], xys[6])
+        X_max = max(xys[0], xys[2], xys[4], xys[6])
+        Y_min = min(xys[1], xys[3], xys[5], xys[7])
+        Y_max = max(xys[1], xys[3], xys[5], xys[7])
+        # cropped1 = cv2.rectangle(image_data, (X_min, Y_min), (X_max, Y_max), (0, 0, 255), 3)
+        cropped = image_data[Y_min:Y_max, X_min:X_max]
+        cv2.imwrite(os.path.join(opath, image_name + '_' + str(i) + '.jpg'), cropped)
+        i += 1
         
     return bboxes
 
