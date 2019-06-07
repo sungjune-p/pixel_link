@@ -377,7 +377,7 @@ def mask_to_bboxes(mask, image_name, image_data, opath, i, image_shape = None, m
         Y_max = max(xys[1], xys[3], xys[5], xys[7])
         # cropped1 = cv2.rectangle(image_data, (X_min, Y_min), (X_max, Y_max), (0, 0, 255), 3)
         cropped = image_data[Y_min:Y_max, X_min:X_max]
-        cv2.imwrite(os.path.join(opath, image_name + '_' + str(i) + '.jpg'), cropped)
+        cv2.imwrite(util.io.join_path(opath, image_name + '_' + str(i) + '.jpg'), cropped)
         i += 1
         
     return bboxes
