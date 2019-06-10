@@ -138,7 +138,7 @@ def test():
     checkpoint_name = util.io.get_filename(str(checkpoint));
     dump_path = util.io.join_path(logdir, checkpoint_name)
     txt_path = util.io.join_path(dump_path,'txt')
-    out_path = util.io.join_path(dump_path, 'cropped image')
+    out_path = util.io.join_path(dump_path, 'cropped_image')
     if not util.io.is_dir(out_path):
         util.io.mkdir(out_path)
     zip_path = util.io.join_path(dump_path, checkpoint_name + '_det.zip')
