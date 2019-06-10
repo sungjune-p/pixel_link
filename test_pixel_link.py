@@ -139,6 +139,8 @@ def test():
     dump_path = util.io.join_path(logdir, checkpoint_name)
     txt_path = util.io.join_path(dump_path,'txt')
     out_path = util.io.join_path(dump_path, 'cropped image')
+    if not util.io.is_dir(out_path):
+        util.io.mkdir(out_path)
     zip_path = util.io.join_path(dump_path, checkpoint_name + '_det.zip')
     
     with tf.Session(config = sess_config) as sess:
