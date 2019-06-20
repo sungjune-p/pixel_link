@@ -131,8 +131,8 @@ def test():
     saver = tf.train.Saver(var_list = variables_to_restore)
     
     
-    image_names = util.io.ls(FLAGS.dataset_dir)
-    image_names.sort()
+   # image_names = util.io.ls(FLAGS.dataset_dir)
+   # image_names.sort()
     
     checkpoint = FLAGS.checkpoint_path
     checkpoint_name = util.io.get_filename(str(checkpoint));
@@ -145,22 +145,30 @@ def test():
     
     with tf.Session(config = sess_config) as sess:
         saver.restore(sess, checkpoint)
+        
+	
+	for num in range(len(util.io.ls(FLAGS.dataset_dir))):
+	    data_path = util.io.join_path(FLAGS.dataset_dir, "0000%d/data/images" %(num+1))
+	    print("data_path : ", data_path)
+	    image_names = util.io.ls(data_path)
+	    image_names.sort()
 
-        for iter, image_name in enumerate(image_names):
-            i = 0
-            image_data = util.img.imread(
-                util.io.join_path(FLAGS.dataset_dir, image_name), rgb = True)
-            image_name = image_name.split('.')[0]
-            pixel_pos_scores, link_pos_scores = sess.run(
-                [net.pixel_pos_scores, net.link_pos_scores], 
-                feed_dict = {
-                    image:image_data
-            })
-               
-            print '%d/%d: %s'%(iter + 1, len(image_names), image_name)
-            to_txt(txt_path,
-                    image_name, image_data, 
-                    pixel_pos_scores, link_pos_scores, out_path, i)
+            for iter, image_name in enumerate(image_names):
+                i = 0
+                image_data = util.img.imread(
+                    util.io.join_path(data_path, image_name), rgb = True)
+                # image_name = image_name.split('.')[0]
+		image_name = '_'.join([image_name.split('_')[0], image_name.split('_')[1]])
+                pixel_pos_scores, link_pos_scores = sess.run(
+                    [net.pixel_pos_scores, net.link_pos_scores], 
+                    feed_dict = {
+                        image:image_data
+                })
+               	
+                print '%d/%d: %s'%(iter + 1, len(image_names), image_name)
+                to_txt(txt_path,
+                        image_name, image_data, 
+                        pixel_pos_scores, link_pos_scores, out_path, i)
 
             
     # create zip file for icdar2015
