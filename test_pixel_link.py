@@ -122,31 +122,29 @@ def test():
     
     with tf.Session(config = sess_config) as sess:
         saver.restore(sess, checkpoint)
-        
-	
-    for num in range(len(util.io.ls(FLAGS.dataset_dir))):
-        if num < 9:
-            data_path = util.io.join_path(FLAGS.dataset_dir, "0000%d/data/images" %(num+1))
-        elif num < 99:
-            data_path = util.io.join_path(FLAGS.dataset_dir, "000%d/data/images" %(num+1))
-        elif num < 999:
-            data_path = util.io.join_path(FLAGS.dataset_dir, "00%d/data/images" %(num+1))
-        else:
-            data_path = util.io.join_path(FLAGS.dataset_dir, "0%d/data/images" %(num+1))
-        print("data_path : ", data_path)
-        image_names = util.io.ls(data_path)
-        image_names.sort()
 
-        for iter, image_name in enumerate(image_names):
-            i = 0
-            image_data = util.img.imread(
-                util.io.join_path(data_path, image_name), rgb = True)
-            # image_name = image_name.split('.')[0]
-            image_name = '_'.join([image_name.split('_')[0], image_name.split('_')[1]])
-            pixel_pos_scores, link_pos_scores = sess.run([net.pixel_pos_scores, net.link_pos_scores], feed_dict = {image:image_data	})
+        for num in range(len(util.io.ls(FLAGS.dataset_dir))):
+            if num < 9:
+                data_path = util.io.join_path(FLAGS.dataset_dir, "0000%d" %(num+1))
+            elif num < 99:
+                data_path = util.io.join_path(FLAGS.dataset_dir, "000%d" %(num+1))
+            elif num < 999:
+                data_path = util.io.join_path(FLAGS.dataset_dir, "00%d" %(num+1))
+            else:
+                data_path = util.io.join_path(FLAGS.dataset_dir, "0%d" %(num+1))
+            print("data_path : ", data_path)
+            image_names = util.io.ls(data_path)
+            image_names.sort()
+
+            for iter, image_name in enumerate(image_names):
+                i = 0
+                image_data = util.img.imread(util.io.join_path(data_path, image_name), rgb = True)
+                # image_name = image_name.split('.')[0]
+                image_name = '_'.join([image_name.split('_')[0], image_name.split('_')[1]])
+                pixel_pos_scores, link_pos_scores = sess.run([net.pixel_pos_scores, net.link_pos_scores], feed_dict = {image:image_data	})
                	
-            print '%d/%d: %s'%(iter + 1, len(image_names), image_name)
-            to_txt(txt_path, image_name, image_data, pixel_pos_scores, link_pos_scores, out_path, i)
+                print '%d/%d: %s'%(iter + 1, len(image_names), image_name)
+                to_txt(txt_path, image_name, image_data, pixel_pos_scores, link_pos_scores, out_path, i)
 
             
     # create zip file for icdar2015
